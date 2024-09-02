@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+        <PackageReference Include="MinimalHelpers.OpenApi" Version="2.0.12" />
+        <PackageReference Include="MinimalHelpers.Routing.Analyzers" Version="1.0.9" />
+        <PackageReference Include="SimpleAuthenticationTools" Version="2.0.22" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+        <PackageReference Include="TinyHelpers.AspNetCore" Version="3.1.9" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TwoFactorAuthenticationSample.DataAccessLayer\TwoFactorAuthenticationSample.DataAccessLayer.csproj" />
+    </ItemGroup>
+
+</Project>

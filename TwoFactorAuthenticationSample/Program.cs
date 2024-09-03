@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using SimpleAuthentication;
@@ -52,6 +53,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 var identityApi = app.MapGroup("/api/auth");
 
 identityApi.MapPost("/register", async Task<Results<Created, BadRequest<IEnumerable<IdentityError>>>> (RegisterRequest request, UserManager<ApplicationUser> userManager) =>
@@ -81,6 +87,16 @@ identityApi.MapPost("/login", async Task<Results<Ok<LoginResponse>, BadRequest>>
     var token = jwtBearerService.CreateToken(request.Email);
     return TypedResults.Ok(new LoginResponse(token));
 })
+.WithOpenApi();
+
+app.MapGet("/api/me", (ClaimsPrincipal user) =>
+{
+    return TypedResults.Ok(new
+    {
+        user.Identity!.Name
+    });
+})
+.RequireAuthorization()
 .WithOpenApi();
 
 app.Run();

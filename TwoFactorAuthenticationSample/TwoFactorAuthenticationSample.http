@@ -1,6 +1,0 @@
-@TwoFactorAuthenticationSample_HostAddress = http://localhost:5055
-
-GET {{TwoFactorAuthenticationSample_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -84,7 +84,7 @@ identityApi.MapPost("/login", async Task<Results<Ok<LoginResponse>, BadRequest>>
         return TypedResults.BadRequest();
     }
 
-    var token = jwtBearerService.CreateToken(request.Email);
+    var token = await jwtBearerService.CreateTokenAsync(request.Email);
     return TypedResults.Ok(new LoginResponse(token));
 })
 .WithOpenApi();

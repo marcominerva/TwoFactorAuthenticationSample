@@ -166,10 +166,12 @@ identityApi.MapPost("/validate", async Task<Results<Ok<LoginResponse>, BadReques
 
     var isValidTotpCode = await userManager.VerifyTwoFactorTokenAsync(user, userManager.Options.Tokens.AuthenticatorTokenProvider, request.Code);
 
+    // Example of verification using Otp.NET library:
+    // https://github.com/kspearrin/Otp.NET
     //var secret = await userManager.GetAuthenticatorKeyAsync(user);
     //var totp = new Totp(Base32Encoding.ToBytes(secret));
 
-    //var isValidTotpCode = totp.VerifyTotp(request.Code, out var timeStepMatched, VerificationWindow.RfcSpecifiedNetworkDelay);
+    //var isValidTotpCode = totp.VerifyTotp(request.Code, out var timeStepUsed, VerificationWindow.RfcSpecifiedNetworkDelay);
 
     if (!isValidTotpCode)
     {

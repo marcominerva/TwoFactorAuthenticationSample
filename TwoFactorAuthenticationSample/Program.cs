@@ -227,6 +227,7 @@ static async Task ConfigureDatabaseAsync(IServiceProvider serviceProvider)
         {
             // Run migration in a transaction to avoid partial migration if it fails.
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
+
             await dbContext.Database.MigrateAsync();
             await transaction.CommitAsync();
         });

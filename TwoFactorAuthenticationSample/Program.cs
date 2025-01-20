@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using QRCoder;
 using SimpleAuthentication;
 using SimpleAuthentication.JwtBearer;
@@ -200,36 +198,5 @@ static async Task ConfigureDatabaseAsync(IServiceProvider serviceProvider)
     using var scope = serviceProvider.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    await EnsureDatabaseAsync();
-    await RunMigrationsAsync();
-
-    async Task EnsureDatabaseAsync()
-    {
-        var dbCreator = dbContext.GetService<IRelationalDatabaseCreator>();
-        var strategy = dbContext.Database.CreateExecutionStrategy();
-
-        await strategy.ExecuteAsync(async () =>
-        {
-            // Create the database if it does not exist.
-            // Do this first so there is then a database to start a transaction against.
-            if (!await dbCreator.ExistsAsync())
-            {
-                await dbCreator.CreateAsync();
-            }
-        });
-    }
-
-    async Task RunMigrationsAsync()
-    {
-        var strategy = dbContext.Database.CreateExecutionStrategy();
-
-        await strategy.ExecuteAsync(async () =>
-        {
-            // Run migration in a transaction to avoid partial migration if it fails.
-            await using var transaction = await dbContext.Database.BeginTransactionAsync();
-
-            await dbContext.Database.MigrateAsync();
-            await transaction.CommitAsync();
-        });
-    }
+    await dbContext.Database.MigrateAsync();
 }

@@ -195,7 +195,7 @@ app.Run();
 
 static async Task ConfigureDatabaseAsync(IServiceProvider serviceProvider)
 {
-    using var scope = serviceProvider.CreateScope();
+    await using var scope = serviceProvider.CreateAsyncScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     await dbContext.Database.MigrateAsync();

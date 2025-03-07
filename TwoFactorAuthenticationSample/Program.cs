@@ -8,6 +8,7 @@ using QRCoder;
 using SimpleAuthentication;
 using SimpleAuthentication.JwtBearer;
 using TinyHelpers.AspNetCore.Extensions;
+using TinyHelpers.AspNetCore.OpenApi;
 using TwoFactorAuthenticationSample.DataAccessLayer;
 using TwoFactorAuthenticationSample.DataAccessLayer.Entities;
 using TwoFactorAuthenticationSample.Models;
@@ -45,10 +46,9 @@ builder.Services.AddScoped(services =>
 builder.Services.AddDefaultProblemDetails();
 builder.Services.AddDefaultExceptionHandler();
 
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddOpenApi(options =>
 {
+    options.RemoveServerList();
     options.AddSimpleAuthentication(builder.Configuration);
 });
 
@@ -61,11 +61,11 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-if (app.Environment.IsDevelopment())
+app.MapOpenApi().AllowAnonymous();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.SwaggerEndpoint("/openapi/v1.json", app.Environment.ApplicationName);
+});
 
 app.UseRouting();
 
@@ -88,8 +88,7 @@ identityApi.MapPost("/register", async Task<Results<Created, BadRequest<IEnumera
 
     var result = await userManager.CreateAsync(user, request.Password);
     return result.Succeeded ? TypedResults.Created() : TypedResults.BadRequest(result.Errors);
-})
-.WithOpenApi();
+});
 
 identityApi.MapPost("/login", async Task<Results<Ok<LoginResponse>, BadRequest>> (LoginRequest request, SignInManager<ApplicationUser> signInManager, IJwtBearerService jwtBearerService,
     ITimeLimitedDataProtector dataProtector) =>
@@ -108,8 +107,7 @@ identityApi.MapPost("/login", async Task<Results<Ok<LoginResponse>, BadRequest>>
 
     var token = dataProtector.Protect(user.Id.ToString(), TimeSpan.FromMinutes(5));
     return TypedResults.Ok(new LoginResponse(token));
-})
-.WithOpenApi();
+});
 
 identityApi.MapGet("/qrcode", async Task<Results<FileContentHttpResult, BadRequest>> (string token, ITimeLimitedDataProtector dataProtector, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment) =>
 {
@@ -140,8 +138,7 @@ identityApi.MapGet("/qrcode", async Task<Results<FileContentHttpResult, BadReque
 
     var qrCodeBytes = qrCode.GetGraphic(3);
     return TypedResults.File(qrCodeBytes, MediaTypeNames.Image.Png);
-})
-.WithOpenApi();
+});
 
 identityApi.MapPost("/validate", async Task<Results<Ok<LoginResponse>, BadRequest>> (ValidationRequest request, ITimeLimitedDataProtector dataProtector, UserManager<ApplicationUser> userManager,
     IJwtBearerService jwtBearerService) =>
@@ -178,18 +175,13 @@ identityApi.MapPost("/validate", async Task<Results<Ok<LoginResponse>, BadReques
 
     var token = await jwtBearerService.CreateTokenAsync(user.Email!);
     return TypedResults.Ok(new LoginResponse(token));
-})
-.WithOpenApi();
+});
 
 app.MapGet("/api/me", (ClaimsPrincipal user) =>
 {
-    return TypedResults.Ok(new
-    {
-        user.Identity!.Name
-    });
+    return TypedResults.Ok(new User(user.Identity!.Name));
 })
-.RequireAuthorization()
-.WithOpenApi();
+.RequireAuthorization();
 
 app.Run();
 

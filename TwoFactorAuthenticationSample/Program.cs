@@ -179,7 +179,7 @@ identityApi.MapPost("/validate", async Task<Results<Ok<LoginResponse>, BadReques
 
 app.MapGet("/api/me", (ClaimsPrincipal user) =>
 {
-    return TypedResults.Ok(new User(user.Identity!.Name));
+    return TypedResults.Ok(new User(user.Identity!.Name!));
 })
 .RequireAuthorization();
 

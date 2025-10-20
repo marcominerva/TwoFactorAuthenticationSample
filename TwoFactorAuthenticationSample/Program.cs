@@ -137,8 +137,7 @@ identityApi.MapGet("/qrcode", async Task<Results<FileContentHttpResult, BadReque
         Label = user.Email
     };
 
-    using var qrCodeGenerator = new QRCodeGenerator();
-    using var qrCodeData = qrCodeGenerator.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
+    using var qrCodeData = QRCodeGenerator.GenerateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
     using var qrCode = new PngByteQRCode(qrCodeData);
 
     var qrCodeBytes = qrCode.GetGraphic(3);

@@ -130,10 +130,15 @@ identityApi.MapGet("/qrcode", async Task<Results<FileContentHttpResult, BadReque
     await userManager.ResetAuthenticatorKeyAsync(user);
     var secret = await userManager.GetAuthenticatorKeyAsync(user);
 
-    var qrCodeUri = $"otpauth://totp/{Uri.EscapeDataString(environment.ApplicationName)}:{user.Email}?secret={secret}&issuer={Uri.EscapeDataString(environment.ApplicationName)}";
+    var payload = new PayloadGenerator.OneTimePassword
+    {
+        Issuer = environment.ApplicationName,
+        Secret = secret!,
+        Label = user.Email
+    };
 
     using var qrCodeGenerator = new QRCodeGenerator();
-    using var qrCodeData = qrCodeGenerator.CreateQrCode(qrCodeUri, QRCodeGenerator.ECCLevel.Q);
+    using var qrCodeData = qrCodeGenerator.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
     using var qrCode = new PngByteQRCode(qrCodeData);
 
     var qrCodeBytes = qrCode.GetGraphic(3);

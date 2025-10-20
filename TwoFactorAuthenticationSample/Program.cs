@@ -36,7 +36,7 @@ builder.Services.AddSimpleAuthentication(builder.Configuration);
 builder.Services.AddDataProtection().SetApplicationName(builder.Environment.ApplicationName)
     .PersistKeysToDbContext<ApplicationDbContext>();
 
-builder.Services.AddScoped(services =>
+builder.Services.AddSingleton(services =>
 {
     var dataProtectionProvider = services.GetRequiredService<IDataProtectionProvider>();
     var dataProtector = dataProtectionProvider.CreateProtector(nameof(ITimeLimitedDataProtector)).ToTimeLimitedDataProtector();
